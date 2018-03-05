@@ -29,6 +29,7 @@ uint32_t displayTimer = 0;
 
 void setup() {
   Serial.begin(115200);
+  pinMode(4, OUTPUT);
 
   // Set the nodeID to 0 for the master node
   mesh.setNodeID(0);
@@ -57,7 +58,7 @@ void loop() {
     uint32_t dat=0;
     switch(header.type){
       // Display the incoming millis() values from the sensor nodes
-      case 'M': network.read(header,&dat,sizeof(dat)); Serial.println(dat); break;
+      case 'M': network.read(header,&dat,sizeof(dat)); Serial.println(dat);digitalWrite(4, dat); break;
       default: network.read(header,0,0); Serial.println(header.type);break;
     }
   }

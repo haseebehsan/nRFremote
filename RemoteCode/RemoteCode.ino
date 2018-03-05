@@ -52,8 +52,8 @@ RF24Mesh mesh(radio, network);
 uint32_t displayTimer = 0;
 
 struct payload_t {
-  unsigned long ms;
-  unsigned long counter;
+  unsigned int switch1;
+  
 };
 
 void setup() {
@@ -64,6 +64,12 @@ void setup() {
   mesh.setNodeID(nodeID);
   // Connect to the mesh
   Serial.println(F("Connecting to the mesh..."));
+
+  pinMode(6, OUTPUT);
+  pinMode(4, INPUT);
+  digitalWrite(4, HIGH);
+
+
   mesh.begin();
 }
 
@@ -75,10 +81,13 @@ void loop() {
 
   // Send to the master node every second
   if (millis() - displayTimer >= 1000) {
+    payload_t payload;
+    payload.switch1 = digitalRead(4);
+    digitalWrite(6, payload.switch1);
     displayTimer = millis();
 
     // Send an 'M' type message containing the current millis()
-    if (!mesh.write(&displayTimer, 'M', sizeof(displayTimer))) {
+    if (!mesh.write(&payload, 'M', sizeof(payload))) {
 
       // If a write fails, check connectivity to the mesh network
       if ( ! mesh.checkConnection() ) {
@@ -98,9 +107,9 @@ void loop() {
     payload_t payload;
     network.read(header, &payload, sizeof(payload));
     Serial.print("Received packet #");
-    Serial.print(payload.counter);
+    Serial.print(payload.switch1);
     Serial.print(" at ");
-    Serial.println(payload.ms);
+    Serial.println(payload.switch1);
   }
 }
 
